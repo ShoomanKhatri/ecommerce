@@ -32,6 +32,7 @@ const PlaceOrder = () => {
         taxPrice: cart.taxPrice,
         totalPrice: cart.totalPrice,
       }).unwrap();
+   console.log('orderitems',res)
 
       if (res.esewaUrl) {
         // Redirect to eSewa payment page
@@ -45,6 +46,17 @@ const PlaceOrder = () => {
       toast.error(error.message);
     }
   };
+//   console.log({
+//   orderItems: cart.cartItems,
+//   shippingAddress: cart.shippingAddress,
+//   paymentMethod: cart.paymentMethod,
+//   itemsPrice: cart.itemsPrice,
+//   shippingPrice: cart.shippingPrice,
+//   taxPrice: cart.taxPrice,
+//   totalPrice: cart.totalPrice,
+// });
+
+
 
   return (
     <>

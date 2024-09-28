@@ -34,8 +34,13 @@ const MERCHANT_CODE = "EPAYTEST"; // eSewa merchant code for testing
 
 // Create Order Controller
 const createOrder = async (req, res) => {
+  console.log("createOrder function triggered with data:", req.body);
   try {
     const { orderItems, shippingAddress, paymentMethod } = req.body;
+
+    console.log("Order Items:", orderItems);
+    console.log("Shipping Address:", shippingAddress);
+    console.log("Payment Method:", paymentMethod);
 
     if (!orderItems || orderItems.length === 0) {
       return res.status(400).json({ message: "No order items" });
@@ -45,6 +50,9 @@ const createOrder = async (req, res) => {
     const itemsFromDB = await Product.find({
       _id: { $in: orderItems.map((x) => x.product) },
     });
+
+//checking
+    console.log("Found products in DB:", itemsFromDB);
 
     // Match order items with DB items and calculate prices
     const dbOrderItems = orderItems.map((itemFromClient) => {
@@ -71,6 +79,9 @@ const createOrder = async (req, res) => {
     }
 
     const { itemsPrice, taxPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItemsFiltered);
+
+    console.log("Calculated Prices - Items Price:", itemsPrice, "Tax Price:", taxPrice, "Shipping Price:", shippingPrice, "Total Price:", totalPrice);
+
 
     // Create a new order in the database
     const order = new Order({
