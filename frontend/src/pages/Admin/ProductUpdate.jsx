@@ -117,7 +117,7 @@ const AdminProductUpdate = () => {
       if (!answer) return;
 
       const { data } = await deleteProduct(params._id);
-      toast.success(`"${data.name}" is deleted`, {
+      toast.success(`Product is deleted`, {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 2000,
       });
@@ -137,21 +137,20 @@ const AdminProductUpdate = () => {
         <div className="flex flex-col md:flex-row">
           <AdminMenu />
           <div className="md:w-3/4 p-3">
-            <div className="h-12">Update / Delete Product</div>
+            <div className="h-10">Update / Delete Product</div>
 
             {image && (
-  <div className="text-center mb-4">
-    <img
-      src={image}
-      alt="product"
-      className="block mx-auto w-full h-[auto] max-w-[300px] aspect-[4/3] object-contain rounded-lg"
-    />
-  </div>
-)}
-
+              <div className="text-center">
+                <img
+                  src={image}
+                  alt="product"
+                  className="block mx-auto w-4/12 h-[40%]"
+                />
+              </div>
+            )}
 
             <div className="mb-3">
-              <label className="text-white  py-2 px-4 block w-full text-center rounded-lg cursor-pointer font-bold py-11" >
+              <label className="text-white  py-2 px-4 block w-full text-center rounded-lg cursor-pointer font-bold py-11">
                 {image ? image.name : "Upload image"}
                 <input
                   type="file"
@@ -198,7 +197,7 @@ const AdminProductUpdate = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="name block">Brands</label> <br />
+                  <label htmlFor="name block">Brand</label> <br />
                   <input
                     type="text"
                     className="p-4 mb-3 w-[30rem] border rounded-lg bg-[#101011] text-white "

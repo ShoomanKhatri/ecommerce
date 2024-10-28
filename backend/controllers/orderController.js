@@ -2,6 +2,7 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import axios from "axios";
 
+
 // Utility Function to calculate prices
 function calcPrices(orderItems) {
   const itemsPrice = orderItems.reduce(
@@ -43,21 +44,22 @@ const createOrder = async (req, res) => {
 
     // Fetch the product details from the database
     const itemsFromDB = await Product.find({
-      _id: { $in: orderItems.map((x) => x.product) },
+      _id: { $in: orderItems.map((x) => x._id) },
     });
 
     // Match order items with DB items and calculate prices
     const dbOrderItems = orderItems.map((itemFromClient) => {
       const matchingItemFromDB = itemsFromDB.find(
-        (itemFromDB) => itemFromDB._id.toString() === itemFromClient.product
-      );
+        (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id);
 
       if (!matchingItemFromDB) {
-        return null; // Return null if product not found
+        res.status(404)
+        throw new Error(`Product not found: ${itemFromClient._id}`)
       }
 
       return {
         ...itemFromClient,
+        product: itemFromClient._id,
         price: matchingItemFromDB.price,
         _id: undefined, // Remove _id to avoid confusion
       };
@@ -96,7 +98,7 @@ const createOrder = async (req, res) => {
         tAmt: totalPrice,
         pid: createdOrder._id.toString(),
         scd: MERCHANT_CODE,
-        su: "http://localhost:5000/api/orders/success", // Success URL
+        su: "http://localhost:5000/api/orders/esewa/success", // Success URL
         fu: "http://localhost:5000/api/orders/failed",   // Failure URL
       };
 
@@ -108,7 +110,17 @@ const createOrder = async (req, res) => {
         order: createdOrder,
       });
     } else {
-      // If payment is not via eSewa, return the created order
+      // Decrease the countInStock for each product in the order
+    for (const item of orderItems) {
+      const product = await Product.findById(item._id);
+
+      if (product) {
+        product.countInStock -= item.qty;
+        await product.save();
+      }
+    }
+
+       // If payment is not via eSewa, return the created order
       return res.status(201).json(createdOrder);
     }
   } catch (error) {
@@ -155,7 +167,11 @@ const verifyOrder = async (req, res) => {
 // Get all orders (Admin)
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({}).populate("user", "id username");
+    const orders = await Order.find({}).populate("user", "id username").sort(
+          {
+            createdAt: -1
+          }
+    )
     return res.json(orders);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -194,7 +210,7 @@ const calculateTotalSales = async (req, res) => {
 };
 
 // Calculate total sales by date (Admin)
-const calcualteTotalSalesByDate = async (req, res) => {
+const calculateTotalSalesByDate = async (req, res) => {
   try {
     const salesByDate = await Order.aggregate([
       {
@@ -288,7 +304,7 @@ export {
   getUserOrders,
   countTotalOrders,
   calculateTotalSales,
-  calcualteTotalSalesByDate,
+  calculateTotalSalesByDate,
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,

@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import Loader from "../../components/Loader";
 import { useProfileMutation } from "../../redux/api/usersApiSlice";
 import { setCredentials } from "../../redux/features/auth/authSlice";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Profile = () => {
   const [username, setUserName] = useState("");
@@ -16,6 +17,9 @@ const Profile = () => {
 
   const { userInfo } = useSelector((state) => state.auth);
   const [updateProfile, { isLoading: loadingUpdateProfile }] = useProfileMutation();
+  
+  // Initialize navigate
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     setUserName(userInfo.username);
@@ -92,27 +96,28 @@ const Profile = () => {
       return;
     }
 
-    // Password matching
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
+    // Check if password is provided and validate
+    if (password || confirmPassword) {
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
 
-    // Password validation
-    const passwordValidationError = validatePassword(password);
-    if (passwordValidationError) {
-      setPasswordError(passwordValidationError);
-      return;
+      const passwordValidationError = validatePassword(password);
+      if (passwordValidationError) {
+        setPasswordError(passwordValidationError);
+        return;
+      }
     }
 
     // Check if there are changes to apply
     const hasChanges =
       username !== userInfo.username ||
       email !== userInfo.email ||
-      (password && password !== userInfo.password);
+      (password && password !== "");
 
     if (!hasChanges) {
-      toast.info("No changes applied");
+      toast.info("No changes to apply");
       return;
     }
 
@@ -121,7 +126,7 @@ const Profile = () => {
         _id: userInfo._id,
         username,
         email,
-        password,
+        password: password || undefined, // Only send password if it's provided
       }).unwrap();
       dispatch(setCredentials({ ...res }));
       toast.success("Profile updated successfully");
@@ -129,6 +134,12 @@ const Profile = () => {
       toast.error(err?.data?.message || err.error);
     }
   };
+
+  
+  const handleOrderClick = () => {
+    navigate("/userorder");  // Ensure this matches the route casing
+};
+
 
   return (
     <div className="container mx-auto p-4 mt-[2rem]">
@@ -203,12 +214,19 @@ const Profile = () => {
               )}
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between mb-4">
               <button
                 type="submit"
-                className="bg-pink-500 text-white py-2 px-4 rounded hover:bg-pink-600"
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-pink-600"
               >
                 Update
+              </button>
+              <button
+                type="button"
+                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                onClick={handleOrderClick}
+              >
+                My Orders
               </button>
             </div>
             {loadingUpdateProfile && <Loader />}

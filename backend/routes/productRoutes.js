@@ -38,7 +38,7 @@ router.get("/new", fetchNewProducts);
 router
   .route("/:id")
   .get(checkId, fetchProductById) // Validate ID first, then fetch product (public route)
-  .put(authenticate, authorizeAdmin, formidable(), updateProductDetails) // Admin protected
+  .put(authenticate, authorizeAdmin, formidable(), updateProductDetails) // Admin protected, form handling for updating product details
   .delete(authenticate, authorizeAdmin, removeProduct); // Admin protected
 
 // Route for filtered products by category and price
