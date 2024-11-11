@@ -25,7 +25,7 @@ GadgetStore is an e-commerce platform built using the MERN stack. Users can brow
 
 ## Running project
 1. in main GadgetStore type (cd .\frontend) then type (npm run dev) enter (terminal 1)
-2. new terminal by clicking plus(+) button above type (cd .\backend) then type (npm run dev) enter (terminal 2)
+2. new terminal by clicking plus(+) button above type (cd .\backend) then type (npm run dev or node index.js) enter (terminal 2)
 3. in terminal 1 (ctrl + click) in link or open localhost in browser if any (unexpected error) open link of (terminal 2)
 4. After this project is runned
 
