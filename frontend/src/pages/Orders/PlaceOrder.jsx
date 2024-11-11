@@ -12,14 +12,29 @@ const PlaceOrder = () => {
   const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    // Redirect to shipping if address is missing
     if (!cart.shippingAddress.address) {
       navigate("/shipping");
     }
   }, [cart.shippingAddress.address, navigate]);
 
-  const dispatch = useDispatch();
+  // New useEffect to handle the success response from eSewa
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const oid = query.get("oid");
+    const amt = query.get("amt");
+    const refId = query.get("refId");
+
+    if (oid && amt && refId) {
+      // Handle successful payment
+      toast.success("Payment Successful!");
+      dispatch(clearCartItems());  // Clear the cart after successful payment
+      navigate("/");  // Redirect to the homepage
+    }
+  }, [dispatch, navigate]);
 
   const placeOrderHandler = async () => {
     try {
@@ -40,7 +55,8 @@ const PlaceOrder = () => {
       } else {
         // Handle non-eSewa payment flow
         dispatch(clearCartItems());
-        navigate(`/order/${res._id}`);
+        toast.success("Your Order has been placed")
+        navigate(`/`);
       }
     } catch (error) {
       toast.error(error.message);
@@ -61,7 +77,7 @@ const PlaceOrder = () => {
   return (
     <>
       <ProgressSteps step1 step2 step3 />
-      <div className="container ml-20 mt-8">
+      <div className="container mx-20 mt-8">
         {cart.cartItems.length === 0 ? (
           <Message>Your cart is empty</Message>
         ) : (
@@ -88,8 +104,7 @@ const PlaceOrder = () => {
                     <td className="p-2">
                       <Link to={`/product/${item.product}`}>{item.name}</Link>
                     </td>
-                    <td className="p-2">{item.qty}</td>
-                    <td className="p-2">{item.price.toFixed(2)}</td>
+                    <td className="p-2">Rs&nbsp;{item.price.toFixed(2)}</td>
                     <td className="p-2">Rs&nbsp;{(item.qty * item.price).toFixed(2)}</td>
                   </tr>
                 ))}
@@ -102,16 +117,16 @@ const PlaceOrder = () => {
           <div className="flex justify-between flex-wrap p-8 bg-[#181818]">
             <ul className="text-lg">
               <li>
-                <span className="font-semibold mb-4">Items:</span> Rs&nbsp;{cart.itemsPrice}
+                <span className="font-semibold">Items:</span> Rs&nbsp;{cart.itemsPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Shipping:</span> Rs&nbsp;{cart.shippingPrice}
+                <span className="font-semibold">Shipping:</span> Rs&nbsp;{cart.shippingPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Tax:</span> Rs&nbsp;{cart.taxPrice}
+                <span className="font-semibold">Tax:</span> Rs&nbsp;{cart.taxPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Total:</span> Rs&nbsp;{cart.totalPrice}
+                <span className="font-semibold">Total:</span> Rs&nbsp;{cart.totalPrice}
               </li>
             </ul>
             {error && <Message variant="danger">{error.data.message}</Message>}
@@ -131,8 +146,8 @@ const PlaceOrder = () => {
 
           <button
             type="button"
-            className="bg-pink-500 text-white py-2 px-4 rounded-full text-lg w-full mt-4"
-            disabled={cart.cartItems.length === 0}
+            className="bg-blue-500 text-white py-2 px-4 rounded-full text-lg w-full mt-4"
+            disabled={cart.cartItems.length === 0 || isLoading}
             onClick={placeOrderHandler}
           >
             Place Order

@@ -12,8 +12,8 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Toggle visibility for password
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle visibility for confirm password
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,14 +32,20 @@ const Register = () => {
     }
   }, [navigate, redirect, userInfo]);
 
-  // Email validation function
   const validateEmail = (email) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValidFormat = emailPattern.test(email);
     const usernamePart = email.split("@")[0];
 
+    const firstTwoCharsPattern = /^[A-Za-z]{2}/;
+    const isValidFirstTwoChars = firstTwoCharsPattern.test(usernamePart);
+
     if (usernamePart.length < 2) {
       return "Email username must be at least 2 characters before the @";
+    }
+
+    if (!isValidFirstTwoChars) {
+      return "The first two characters of the email username must be alphabets";
     }
 
     const domainPattern = /@(gmail|yahoo|outlook)\.com$/;
@@ -56,7 +62,6 @@ const Register = () => {
     return "";
   };
 
-  // Password validation function
   const validatePassword = (pass) => {
     const minLength = 8;
     const hasNumber = /\d/;
@@ -76,36 +81,38 @@ const Register = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-  
-    // Username validation
-    const usernamePattern = /^[A-Za-z]{3}[A-Za-z0-9 ]{0,17}$/; // Starts with at least 3 alphabets, followed by up to 17 alphanumeric characters
-  
+
+    const usernamePattern = /^[A-Za-z]{3}[A-Za-z0-9 ]{0,17}$/;
+
+    const errors = [];
     if (!usernamePattern.test(username)) {
-      toast.error("Username must start with at least 3 alphabetic characters and be a maximum of 20 characters long.");
-      return;
+      errors.push("Username must start with at least 3 alphabetic characters and be a maximum of 20 characters long.");
     }
 
-    // Email validation
     const emailValidationError = validateEmail(email);
     if (emailValidationError) {
-      toast.error(emailValidationError);
-      return;
+      errors.push(emailValidationError);
     }
 
-    // Password matching
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
+      errors.push("Passwords do not match");
     }
 
-    // Password validation
     const passwordValidationError = validatePassword(password);
     if (passwordValidationError) {
-      setPasswordError(passwordValidationError);
-      return;
+      errors.push(passwordValidationError);
     }
 
-    // Registration process
+    if (errors.length > 0) {
+      // Display all errors with a 1-second interval
+      errors.forEach((error, index) => {
+        setTimeout(() => {
+          toast.error(error);
+        }, index * 1000); // Each error will show after 1 second from the last
+      });
+      return; // Stop the submission process
+    }
+
     try {
       const res = await register({ username, email, password }).unwrap();
       dispatch(setCredentials({ ...res }));
@@ -128,10 +135,7 @@ const Register = () => {
 
         <form onSubmit={submitHandler} className="container w-[40rem]">
           <div className="my-[1.7rem]">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-white"
-            >
+            <label htmlFor="name" className="block text-sm font-medium text-white">
               Name
             </label>
             <input
@@ -146,10 +150,7 @@ const Register = () => {
           </div>
 
           <div className="my-[1.7rem]">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-white"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-white">
               Email Address
             </label>
             <input
@@ -164,10 +165,7 @@ const Register = () => {
           </div>
 
           <div className="my-[1.7rem] relative">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-white"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-white">
               Password
             </label>
             <input
@@ -184,7 +182,7 @@ const Register = () => {
             />
             <button
               type="button"
-              className="absolute right-2 top-7 text-gray-500 text-2xl" // Adjusted the size and position of the eye icon
+              className="absolute right-2 top-7 text-gray-500 text-2xl"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? "🙈" : "👁️"}
@@ -195,10 +193,7 @@ const Register = () => {
           </div>
 
           <div className="my-[0.7rem] relative">
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-white"
-            >
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-white">
               Confirm Password
             </label>
             <input
@@ -212,7 +207,7 @@ const Register = () => {
             />
             <button
               type="button"
-              className="absolute right-2 top-7 text-gray-500 text-2xl" // Adjusted the size and position of the eye icon
+              className="absolute right-2 top-7 text-gray-500 text-2xl"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               {showConfirmPassword ? "🙈" : "👁️"}

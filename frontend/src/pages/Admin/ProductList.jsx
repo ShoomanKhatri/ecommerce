@@ -108,13 +108,15 @@ const ProductList = () => {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-              <div className="two  ">
+              <div className="two">
                 <label htmlFor="name block">Price</label> <br />
                 <input
                   type="number"
                   className="p-4 mb-3 w-[30rem] border rounded-lg bg-[#101011] text-white"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) =>
+                    setPrice(Math.max(1, Math.min(200000, e.target.value)))
+                  }
                 />
               </div>
             </div>
@@ -125,10 +127,12 @@ const ProductList = () => {
                   type="number"
                   className="p-4 mb-3 w-[30rem] border rounded-lg bg-[#101011] text-white"
                   value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, Math.min(10000, e.target.value)))
+                  }
                 />
               </div>
-              <div className="two ">
+              <div className="two">
                 <label htmlFor="name block">Brand</label> <br />
                 <input
                   type="text"
@@ -160,11 +164,11 @@ const ProductList = () => {
                 />
               </div>
 
-              <div class="ml-6">
-                <label  htmlFor="">  Category</label> <br />
+              <div className="ml-6">
+                <label htmlFor="">Category</label> <br />
                 <select
                   placeholder="Choose Category"
-                  className="p-4  mb-3 w-[30rem] border rounded-lg bg-[#101011] text-white"
+                  className="p-4 mb-3 w-[30rem] border rounded-lg bg-[#101011] text-white"
                   onChange={(e) => setCategory(e.target.value)}
                 >
                   {categories?.map((c) => (
