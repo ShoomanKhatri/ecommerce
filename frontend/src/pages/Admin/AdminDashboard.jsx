@@ -11,12 +11,21 @@ import OrderList from "./OrderList";
 import Loader from "../../components/Loader";
 
 const AdminDashboard = () => {
-  const { data: sales, isLoading: loadingSales, refetch: refetchSales } =
-    useGetTotalSalesQuery();
-  const { data: customers, isLoading: loadingCustomers, refetch: refetchCustomers } =
-    useGetUsersQuery();
-  const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } =
-    useGetTotalOrdersQuery();
+  const {
+    data: sales,
+    isLoading: loadingSales,
+    refetch: refetchSales,
+  } = useGetTotalSalesQuery();
+  const {
+    data: customers,
+    isLoading: loadingCustomers,
+    refetch: refetchCustomers,
+  } = useGetUsersQuery();
+  const {
+    data: orders,
+    isLoading: loadingOrders,
+    refetch: refetchOrders,
+  } = useGetTotalOrdersQuery();
   const { data: salesDetail } = useGetTotalSalesByDateQuery();
 
   const [state, setState] = useState({

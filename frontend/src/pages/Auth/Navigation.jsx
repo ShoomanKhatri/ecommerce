@@ -31,6 +31,14 @@ const Navigation = () => {
 
   const [logoutApiCall] = useLogoutMutation();
 
+  console.log("user Info", userInfo);
+  console.log("🛒 Cart Items:", cartItems);
+  console.log("⬇️ Dropdown Open:", dropdownOpen);
+  console.log(
+    "📦 Total Cart Quantity:",
+    cartItems.reduce((a, c) => a + c.qty, 0)
+  );
+
   const logoutHandler = async () => {
     try {
       await logoutApiCall().unwrap();
