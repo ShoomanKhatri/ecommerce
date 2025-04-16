@@ -26,14 +26,14 @@ const Order = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const isSuccess = urlParams.get("success");
-    if (isSuccess === "true") { // Check if isSuccess is strictly equal to "true"
+    if (isSuccess === "true") {
+      // Check if isSuccess is strictly equal to "true"
       toast.success("Payment successful! Redirecting to home...");
       setTimeout(() => {
-        window.location.href = "http://localhost:5000/";
+        window.location.href = "https://ecommerce-6ucz.onrender.com/";
       }, 2000);
     }
   }, []);
-  
 
   const deliverHandler = async () => {
     await deliverOrder(orderId);

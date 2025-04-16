@@ -13,6 +13,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import { ObjectId } from "mongodb";
 import User from "./models/userModel.js";
+import cors from "cors";
 
 dotenv.config();
 const port = process.env.PORT || 5000;

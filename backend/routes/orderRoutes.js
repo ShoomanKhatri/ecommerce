@@ -11,7 +11,7 @@ import {
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered, // Ensure this is imported correctly
-  verifyOrder
+  verifyOrder,
 } from "../controllers/orderController.js";
 
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
@@ -21,26 +21,33 @@ import Product from "../models/productModel.js";
 // Create a new order and get all orders (admin only)
 router
   .route("/")
-  .post(authenticate, createOrder)  
+  .post(authenticate, createOrder)
   .get(authenticate, authorizeAdmin, getAllOrders);
 
 // eSewa success and failure routes for payment verification
 router.get("/success", verifyOrder); // Updated: Changed to "/success" for clarity
 router.get("/failed", (req, res) => {
-  res.status(400).json({ message: 'Payment failed or cancelled' });
+  res.status(400).json({ message: "Payment failed or cancelled" });
 });
 
 // Get orders for the authenticated user
 router.route("/mine").get(authenticate, getUserOrders);
 
 // Admin routes for total orders and sales
-router.route("/total-orders").get(authenticate, authorizeAdmin, countTotalOrders); 
-router.route("/total-sales").get(authenticate, authorizeAdmin, calculateTotalSales);  
-router.route("/total-sales-by-date").get(authenticate, authorizeAdmin, calculateTotalSalesByDate);  
+router
+  .route("/total-orders")
+  .get(authenticate, authorizeAdmin, countTotalOrders);
+router
+  .route("/total-sales")
+  .get(authenticate, authorizeAdmin, calculateTotalSales);
+router
+  .route("/total-sales-by-date")
+  .get(authenticate, authorizeAdmin, calculateTotalSalesByDate);
 
 // Order by ID
-router.route("/:id")
-  .get(authenticate, findOrderById)  
+router
+  .route("/:id")
+  .get(authenticate, findOrderById)
   .put(authenticate, markOrderAsPaid) // this marks the order as paid
   .put(authenticate, authorizeAdmin, markOrderAsDelivered); // This needs to be for delivery status
 
@@ -52,7 +59,7 @@ router.put("/:id/deliver", authenticate, authorizeAdmin, async (req, res) => {
     const order = await Order.findById(orderId);
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     order.isDelivered = true; // Update the delivery status
@@ -60,19 +67,19 @@ router.put("/:id/deliver", authenticate, authorizeAdmin, async (req, res) => {
 
     await order.save(); // Save the changes to the database
 
-    res.status(200).json({ message: 'Order delivered', order });
+    res.status(200).json({ message: "Order delivered", order });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 // eSewa payment success handling
-router.get('/esewa/success', async (req, res) => {
+router.get("/esewa/success", async (req, res) => {
   const { oid, amt, refId } = req.query; // oid: order id, amt: amount, refId: payment reference id
 
   try {
     // Find the order by its ID
-    const order = await Order.findById(oid).populate('orderItems.product');
+    const order = await Order.findById(oid).populate("orderItems.product");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -87,10 +94,10 @@ router.get('/esewa/success', async (req, res) => {
     order.isPaid = true;
     order.paidAt = new Date();
     order.paymentResult = {
-      id: refId,           // eSewa reference ID
-      status: "Completed",  // Payment status
+      id: refId, // eSewa reference ID
+      status: "Completed", // Payment status
       update_time: new Date().toISOString(),
-      email_address: "",    // Optionally add the user's email address if available
+      email_address: "", // Optionally add the user's email address if available
     };
 
     // Save the updated order
@@ -116,8 +123,11 @@ router.get('/esewa/success', async (req, res) => {
     // Redirect user to frontend (React) success page with order ID
     res.redirect(`http://localhost:5173/?oid=${oid}`);
   } catch (error) {
-    console.error('Error updating order payment status and product stock:', error);
-    res.status(500).send('Internal Server Error');
+    console.error(
+      "Error updating order payment status and product stock:",
+      error
+    );
+    res.status(500).send("Internal Server Error");
   }
 });
 
