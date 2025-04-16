@@ -59,7 +59,7 @@ const listCategory = asyncHandler(async (req, res) => {
     const all = await Category.find({});
     res.json(all);
   } catch (error) {
-    console.log(error);
+    console.error("❌ listCategory Error:", error.message);
     return res.status(400).json(error.message);
   }
 });

@@ -1,7 +1,7 @@
 import User from "../models/userModel.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import bcrypt from "bcryptjs";
-import createToken from "../utils/createToken.js";
+import createToken from "../routes/utils/createToken.js";
 
 // Create a new user
 const createUser = asyncHandler(async (req, res) => {
@@ -15,7 +15,9 @@ const createUser = asyncHandler(async (req, res) => {
   // Check if the user already exists
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400).json({ message: "Email already taken, please choose another email" });
+    res
+      .status(400)
+      .json({ message: "Email already taken, please choose another email" });
     return;
   }
 
@@ -108,7 +110,8 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
       user.password = hashedPassword;
     }
 
-    const isUpdated = user.username !== originalUsername || user.email !== originalEmail;
+    const isUpdated =
+      user.username !== originalUsername || user.email !== originalEmail;
 
     if (isUpdated) {
       const updatedUser = await user.save();

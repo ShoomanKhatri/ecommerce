@@ -2,7 +2,6 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import axios from "axios";
 
-
 // Utility Function to calculate prices
 function calcPrices(orderItems) {
   const itemsPrice = orderItems.reduce(
@@ -52,17 +51,18 @@ const createOrder = async (req, res) => {
       _id: { $in: orderItems.map((x) => x._id) },
     });
 
-//checking
+    //checking
     console.log("Found products in DB:", itemsFromDB);
 
     // Match order items with DB items and calculate prices
     const dbOrderItems = orderItems.map((itemFromClient) => {
       const matchingItemFromDB = itemsFromDB.find(
-        (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id);
+        (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
+      );
 
       if (!matchingItemFromDB) {
-        res.status(404)
-        throw new Error(`Product not found: ${itemFromClient._id}`)
+        res.status(404);
+        throw new Error(`Product not found: ${itemFromClient._id}`);
       }
 
       return {
@@ -74,16 +74,27 @@ const createOrder = async (req, res) => {
     });
 
     // Filter out null values from dbOrderItems
-    const dbOrderItemsFiltered = dbOrderItems.filter(item => item !== null);
+    const dbOrderItemsFiltered = dbOrderItems.filter((item) => item !== null);
 
     if (dbOrderItemsFiltered.length !== orderItems.length) {
-      return res.status(404).json({ message: "One or more products not found." });
+      return res
+        .status(404)
+        .json({ message: "One or more products not found." });
     }
 
-    const { itemsPrice, taxPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItemsFiltered);
+    const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
+      calcPrices(dbOrderItemsFiltered);
 
-    console.log("Calculated Prices - Items Price:", itemsPrice, "Tax Price:", taxPrice, "Shipping Price:", shippingPrice, "Total Price:", totalPrice);
-
+    console.log(
+      "Calculated Prices - Items Price:",
+      itemsPrice,
+      "Tax Price:",
+      taxPrice,
+      "Shipping Price:",
+      shippingPrice,
+      "Total Price:",
+      totalPrice
+    );
 
     // Create a new order in the database
     const order = new Order({
@@ -110,28 +121,28 @@ const createOrder = async (req, res) => {
         pid: createdOrder._id.toString(),
         scd: MERCHANT_CODE,
         su: "http://localhost:5000/api/orders/esewa/success", // Success URL
-        fu: "http://localhost:5000/api/orders/failed",   // Failure URL
+        fu: "http://localhost:5000/api/orders/failed", // Failure URL
       };
 
       const esewaUrl = `${ESEWA_URL}?amt=${paymentPayload.amt}&psc=${paymentPayload.psc}&pdc=${paymentPayload.pdc}&txAmt=${paymentPayload.txAmt}&tAmt=${paymentPayload.tAmt}&pid=${paymentPayload.pid}&scd=${paymentPayload.scd}&su=${paymentPayload.su}&fu=${paymentPayload.fu}`;
 
       return res.status(201).json({
         message: "Order created. Redirecting to eSewa.",
-        esewaUrl,  // Send eSewa URL to the frontend for redirection
+        esewaUrl, // Send eSewa URL to the frontend for redirection
         order: createdOrder,
       });
     } else {
       // Decrease the countInStock for each product in the order
-    for (const item of orderItems) {
-      const product = await Product.findById(item._id);
+      for (const item of orderItems) {
+        const product = await Product.findById(item._id);
 
-      if (product) {
-        product.countInStock -= item.qty;
-        await product.save();
+        if (product) {
+          product.countInStock -= item.qty;
+          await product.save();
+        }
       }
-    }
 
-       // If payment is not via eSewa, return the created order
+      // If payment is not via eSewa, return the created order
       return res.status(201).json(createdOrder);
     }
   } catch (error) {
@@ -155,7 +166,7 @@ const verifyOrder = async (req, res) => {
     });
 
     // Check the response from eSewa for success
-    if (response.data.includes('<response_code>Success</response_code>')) {
+    if (response.data.includes("<response_code>Success</response_code>")) {
       // Update order status to "PAID"
       const order = await Order.findById(oid);
       if (!order) {
@@ -178,11 +189,9 @@ const verifyOrder = async (req, res) => {
 // Get all orders (Admin)
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({}).populate("user", "id username").sort(
-          {
-            createdAt: -1
-          }
-    )
+    const orders = await Order.find({}).populate("user", "id username").sort({
+      createdAt: -1,
+    });
     return res.json(orders);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -213,7 +222,10 @@ const countTotalOrders = async (req, res) => {
 const calculateTotalSales = async (req, res) => {
   try {
     const orders = await Order.find();
-    const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
+    const totalSales = orders.reduce(
+      (sum, order) => sum + parseFloat(order.totalPrice),
+      0
+    );
     return res.json({ totalSales });
   } catch (error) {
     return res.status(500).json({ error: error.message });

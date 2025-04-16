@@ -11,11 +11,21 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import { ObjectId } from "mongodb";
+import User from "./models/userModel.js";
 
 dotenv.config();
 const port = process.env.PORT || 5000;
 
 connectDB();
+
+// const run = async () => {
+//   await connectDB();
+
+//   const user = await User.findById("67fcfcf78089888f814384c3");
+//   console.log(user);
+// };
+// run();
 
 const app = express();
 
@@ -28,8 +38,6 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/orders", orderRoutes);
-
- 
 
 const __dirname = path.resolve();
 app.use("/uploads", express.static(path.join(__dirname + "/uploads")));
