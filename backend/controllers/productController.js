@@ -9,7 +9,8 @@ const addProduct = asyncHandler(async (req, res) => {
   // Validation
   if (!name) return res.status(400).json({ error: "Name is required" });
   if (!brand) return res.status(400).json({ error: "Brand is required" });
-  if (!description) return res.status(400).json({ error: "Description is required" });
+  if (!description)
+    return res.status(400).json({ error: "Description is required" });
   if (!price) return res.status(400).json({ error: "Price is required" });
   if (!category) return res.status(400).json({ error: "Category is required" });
 
@@ -37,7 +38,8 @@ const updateProductDetails = asyncHandler(async (req, res) => {
   // Validation
   if (!name) return res.status(400).json({ error: "Name is required" });
   if (!brand) return res.status(400).json({ error: "Brand is required" });
-  if (!description) return res.status(400).json({ error: "Description is required" });
+  if (!description)
+    return res.status(400).json({ error: "Description is required" });
   if (!price) return res.status(400).json({ error: "Price is required" });
   if (!category) return res.status(400).json({ error: "Category is required" });
 
@@ -117,7 +119,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server Error" });
+    res.status(500).json({ error: "Server Error", error: error.message });
   }
 });
 
