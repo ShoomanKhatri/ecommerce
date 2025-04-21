@@ -36,7 +36,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://ecommerce-pearl-eight.vercel.app/",
+  "https://ecommerce-pearl-eight.vercel.app",
 ];
 
 app.use(

@@ -30,8 +30,8 @@ GadgetStore is an e-commerce platform built using the MERN stack. Users can brow
 4. After this project is runned
 
 ## Admin credintials
-email: rashish.100@gmail.com
-password: Rashish@123
+email:
+password: 
 
 
                                            THANK YOU  !!!
