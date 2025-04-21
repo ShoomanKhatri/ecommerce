@@ -40,25 +40,25 @@ const allowedOrigins = [
 ];
 
 // Serve static files with correct MIME types
-const __dirname = path.resolve();
-app.use(
-  "/uploads",
-  (req, res, next) => {
-    const filePath = path.join(__dirname, "/uploads", req.path);
-    const mimeType = {
-      ".jpg": "image/jpeg",
-      ".jpeg": "image/jpeg",
-      ".png": "image/png",
-      ".gif": "image/gif",
-    }[path.extname(filePath).toLowerCase()];
+// const __dirname = path.resolve();
+// app.use(
+//   "/uploads",
+//   (req, res, next) => {
+//     const filePath = path.join(__dirname, "/uploads", req.path);
+//     const mimeType = {
+//       ".jpg": "image/jpeg",
+//       ".jpeg": "image/jpeg",
+//       ".png": "image/png",
+//       ".gif": "image/gif",
+//     }[path.extname(filePath).toLowerCase()];
 
-    if (mimeType) {
-      res.setHeader("Content-Type", mimeType);
-    }
-    next();
-  },
-  express.static(path.join(__dirname, "/uploads"))
-);
+//     if (mimeType) {
+//       res.setHeader("Content-Type", mimeType);
+//     }
+//     next();
+//   },
+//   express.static(path.join(__dirname, "/uploads"))
+// );
 
 app.use(
   cors({
@@ -75,7 +75,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/orders", orderRoutes);
 
-// const __dirname = path.resolve();
-// app.use("/uploads", express.static(path.join(__dirname + "/uploads")));
+const __dirname = path.resolve();
+app.use("/uploads", express.static(path.join(__dirname + "/public/uploads")));
 
 app.listen(port, () => console.log(`Server running on port: ${port}`));
