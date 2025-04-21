@@ -76,6 +76,6 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/orders", orderRoutes);
 
 const __dirname = path.resolve();
-app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "/uploads"))); // tested on public/uploads too
 
 app.listen(port, () => console.log(`Server running on port: ${port}`));
